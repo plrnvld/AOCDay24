@@ -8,8 +8,6 @@ main = do
         makeResText varInput res = "Outcome for " ++ show varInput ++ " = " ++ show res ++ "\n"
 
     putStrLn $ concat $ map (\i -> (makeResText i (calcRes i))) allInputs
-    
-
 
 calcBlock :: Int -> Int -> Int -> Int -> Int -> Int
 calcBlock newVar prevZ step5Div step6Add step16Add =
@@ -29,6 +27,8 @@ calcBlock newVar prevZ step5Div step6Add step16Add =
         y_5 = y_4 * x_3
         z_3 = z_2 + y_5
         in z_3
+
+-- Block 1 really adds 4 to the variable
 
         
         
