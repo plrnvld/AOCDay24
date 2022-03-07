@@ -15,36 +15,43 @@ main = do
         calcBlock12 = calcBlock 26 (-10) 12
         calcBlock13 = calcBlock 26 (-4) 14
         calcBlock14 = calcBlock 26 (-5) 14
-        calcRes = calcBlock6 1000
+        calcBlockExp = calcBlockAlt 26 (-10) 0
+        calcRes = calcBlockAlt 26 7 0 26000
         makeResText varInput res = "Outcome for " ++ show varInput ++ " = " ++ show res ++ "\n"
 
     putStrLn $ concatMap (\i -> makeResText i (calcRes i)) allInputs
 
 calcBlock :: Int -> Int -> Int -> Int -> Int -> Int
-calcBlock step5Div step6Add step16Add prevZ newVar =
-    let w = newVar
-        z = prevZ
-        x = z -- Step 2 & 3 combined
-        x_1 = x `mod` 26
+calcBlock step5Div step6Add step16Add z newVar =
+    let x = z `mod` 26 -- Step 2 & 3 & 4 combined
         z_1 = z `div` step5Div
-        x_2 = x_1 + step6Add
-        x_3 = if x_2 == w then 0 else 1 -- Step 7 & 8 combined
-        y = 25 -- Step 9 & 10 combined
-        y_1 = y * x_3
-        y_2 = y_1 + 1
-        z_2 = z_1 * y_2
-        y_3 = w -- Step 14 & 15 combined
-        y_4 = y_3 + step16Add
-        y_5 = y_4 * x_3
-        z_3 = z_2 + y_5
-        in z_3
+        x_1 = if x + step6Add == newVar then 0 else 1 -- Step 7 & 8 combined
+        y = 25 * x_1 -- Step 9 & 10 & 11 combined
+        y_1 = y + 1
+        z_2 = z_1 * y_1
+        y_new = newVar + step16Add -- Step 14 & 15 & 16 combined
+        in z_2 + y_new * x_1 -- Step 17 & 18 combined
+
+calcBlockAlt :: Int -> Int -> Int -> Int -> Int -> Int
+calcBlockAlt step5Div step6Add step16Add z newVar =
+    let x_1 = if z `mod` 26 + step6Add == newVar then 0 else 1 -- Step 7 & 8 combined
+        in (25 * (z `div` step5Div) + newVar + step16Add) * x_1 + (z `div` step5Div)
+
+-- when step5Div == 1 and step6Add > 9
+-- 26 * z + step16Add + newVar
+
+-- when step5Div == 26 and z `mod` 26 + step6Add = newVar
+-- z `div` 26 (step6Add and newVar are not in the result)
+
+-- when step5Div == 26 and z `mod` 26 + step6Add != newVar
+-- 26 * (z `div` 26) + step16Add + newVar (step6Add is not in the result)
 
 -- Block 1 really does: f(var) = var + 4
 -- Block 2 really does: f(var, z) = 26z + var + 11
 -- Block 3 really does: f(var, z) = 26z + var + 5
 -- Block 4 is the same as block 2
 -- Block 5 really does: f(var, z) = 26z + var + 14
--- Block 6 really does: f(var, z) = var + 7? Not true, bigger numbers give bigger results
+-- Block 6 only does something with step6Add when  step6Add = variable - (x `mod` 26)
 
 
         
