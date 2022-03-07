@@ -16,7 +16,7 @@ main = do
         calcBlock13 = calcBlock 26 (-4) 14
         calcBlock14 = calcBlock 26 (-5) 14
         calcBlockExp = calcBlockAlt 26 (-10) 0
-        calcRes = calcBlockAlt 26 7 0 26000
+        calcRes = calcBlockAlt 26 1 0 26000
         makeResText varInput res = "Outcome for " ++ show varInput ++ " = " ++ show res ++ "\n"
 
     putStrLn $ concatMap (\i -> makeResText i (calcRes i)) allInputs
