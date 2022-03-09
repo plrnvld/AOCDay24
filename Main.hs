@@ -1,9 +1,10 @@
 main = do
     let bigNum = replicate 14 9
+        bigNum2 = digits 12345678910111
         blocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4, 
             calcBlock5, calcBlock6, calcBlock7, calcBlock8, calcBlock9, 
             calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
-        blockPerDigit = zipWith (\block num -> flip block num) blocks bigNum
+        blockPerDigit = zipWith flip blocks bigNum2
         outcome = foldr (\f v -> f v) 0 blockPerDigit
 
         allInputs = [1..9]
@@ -26,9 +27,21 @@ main = do
         calcRes = calcBlockAlt 26 1 0 26000
         makeResText varInput res = "Outcome for " ++ show varInput ++ " = " ++ show res ++ "\n"
 
+        blocksSmall = [calcBlock12, calcBlock13, calcBlock14]
+        
+        calcSmall n = 
+            let nums = digits n
+                blockPerNum = zipWith flip blocksSmall nums
+            in foldr (\f v -> f v) 0 blockPerNum
+
+        smallNums = filter (\n -> n `mod` 10 /= 0)  [999, 998 ..  11]
+        smallOutcomes = map (\n -> "Result for " ++ show n ++ " = " ++ show (calcSmall n) ++ "\n") smallNums 
+    
+    putStrLn $ concat smallOutcomes
     putStrLn $ concatMap (\i -> makeResText i (calcRes i)) allInputs
-    putStrLn $ show bigNum
-    putStrLn $ show outcome
+    print bigNum2
+    print outcome
+    print $ 0 `div` 26
 
 calcBlock :: Int -> Int -> Int -> Int -> Int -> Int
 calcBlock step5Div step6Add step16Add z newVar =
@@ -53,11 +66,26 @@ digits = map (read.return) . show
 -- when step5Div == 1 and step6Add > 9
 -- 26 * z + step16Add + newVar
 
--- when step5Div == 26 and z `mod` 26 + step6Add = newVar
+
+
+
+
+-- For step5Div == 26
+-- =====================================
+-- when step5Div == 26 and z `mod` 26 + step6Add == newVar
 -- z `div` 26                                   (step6Add and newVar are not in the result)
 
 -- when step5Div == 26 and z `mod` 26 + step6Add != newVar
 -- 26 * (z `div` 26) + step16Add + newVar       (step6Add is not in the result)
+
+
+-- getting valid means: calcBlock 26 (-5) 14 z newVar ==> 0 (step6Add == -5)
+-- if z `mod` 26 + step6Add == newVar then z `div` 26 (then z needs to be [0, 25] to get 0)
+-- then z `mod` 26 - 5 == newVar (dan z = newVar + 5)
+
+
+
+
 
 -- Block 1 really does: f(var) = var + 4
 -- Block 2 really does: f(var, z) = 26z + var + 11
