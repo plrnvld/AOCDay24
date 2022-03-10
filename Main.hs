@@ -1,47 +1,25 @@
-main = do
-    let bigNum = replicate 14 9
-        bigNum2 = digits 12345678910111
-        blocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4, 
-            calcBlock5, calcBlock6, calcBlock7, calcBlock8, calcBlock9, 
-            calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
-        blockPerDigit = zipWith flip blocks bigNum2
-        outcome = foldr (\f v -> f v) 0 blockPerDigit
+calcBlock1 = calcBlock 1 12 4
+calcBlock2 = calcBlock 1 11 11
+calcBlock3 = calcBlock 1 13 5
+calcBlock4 = calcBlock2
+calcBlock5 = calcBlock 1 14 14
+calcBlock6 = calcBlock 26 (-10) 7
+calcBlock7 = calcBlock2
+calcBlock8 = calcBlock 26 (-9) 4
+calcBlock9 = calcBlock 26 (-3) 6
+calcBlock10 = calcBlock3
+calcBlock11 = calcBlock 26 (-5) 9
+calcBlock12 = calcBlock 26 (-10) 12
+calcBlock13 = calcBlock 26 (-4) 14
+calcBlock14 = calcBlock 26 (-5) 14
 
-        allInputs = [1..9]
-        varInput = 1
-        calcBlock1 = calcBlock 1 12 4
-        calcBlock2 = calcBlock 1 11 11
-        calcBlock3 = calcBlock 1 13 5
-        calcBlock4 = calcBlock2
-        calcBlock5 = calcBlock 1 14 14
-        calcBlock6 = calcBlock 26 (-10) 7
-        calcBlock7 = calcBlock2
-        calcBlock8 = calcBlock 26 (-9) 4
-        calcBlock9 = calcBlock 26 (-3) 6
-        calcBlock10 = calcBlock3
-        calcBlock11 = calcBlock 26 (-5) 9
-        calcBlock12 = calcBlock 26 (-10) 12
-        calcBlock13 = calcBlock 26 (-4) 14
-        calcBlock14 = calcBlock 26 (-5) 14
-        calcBlockExp = calcBlockAlt 26 (-10) 0
-        calcRes = calcBlockAlt 26 1 0 26000
-        makeResText varInput res = "Outcome for " ++ show varInput ++ " = " ++ show res ++ "\n"
+blocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4, 
+    calcBlock5, calcBlock6, calcBlock7, calcBlock8, calcBlock9, 
+    calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
 
-        blocksSmall = [calcBlock12, calcBlock13, calcBlock14]
-        
-        calcSmall n = 
-            let nums = digits n
-                blockPerNum = zipWith flip blocksSmall nums
-            in foldr (\f v -> f v) 0 blockPerNum
+blocksSmall = [calcBlock11, calcBlock12, calcBlock13, calcBlock14]
 
-        smallNums = filter (\n -> n `mod` 10 /= 0)  [999, 998 ..  11]
-        smallOutcomes = map (\n -> "Result for " ++ show n ++ " = " ++ show (calcSmall n) ++ "\n") smallNums 
-    
-    putStrLn $ concat smallOutcomes
-    putStrLn $ concatMap (\i -> makeResText i (calcRes i)) allInputs
-    print bigNum2
-    print outcome
-    print $ 0 `div` 26
+allInputs = [1..9]
 
 calcBlock :: Int -> Int -> Int -> Int -> Int -> Int
 calcBlock step5Div step6Add step16Add z newVar =
@@ -59,6 +37,30 @@ calcBlockAlt step5Div step6Add step16Add z newVar =
     let x_1 = if z `mod` 26 + step6Add == newVar then 0 else 1 -- Step 7 & 8 combined
         in (25 * (z `div` step5Div) + newVar + step16Add) * x_1 + (z `div` step5Div)
 
+main = do
+    let bigNum = replicate 14 9
+        bigNum2 = digits 12345678910111
+        
+        blockPerDigit = zipWith flip blocks bigNum2
+        outcome = foldr (\f v -> f v) 0 blockPerDigit
+        
+        calcRes = calcBlockAlt 26 1 0 26000
+        makeResText varInput res = "Outcome for " ++ show varInput ++ " = " ++ show res ++ "\n"
+        
+        calcSmall n = 
+            let nums = digits n
+                blockPerNum = zipWith flip blocksSmall nums
+            in foldr (\f v -> f v) 0 blockPerNum
+
+        smallNums = filter (\n -> n `mod` 10 /= 0)  [9999, 9998 ..  11]
+        validNums = filter (\n -> calcSmall n == 0) smallNums
+        smallOutcomes = map (\n -> "Result for " ++ show n ++ " = " ++ show (calcSmall n) ++ "\n") validNums 
+    
+    putStrLn $ concat smallOutcomes
+    putStrLn $ concatMap (\i -> makeResText i (calcRes i)) allInputs
+    print bigNum2
+    print outcome
+    
 digits :: Integer -> [Int]
 digits = map (read.return) . show
 
