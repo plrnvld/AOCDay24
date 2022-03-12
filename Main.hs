@@ -40,15 +40,18 @@ calcBlockAlt step5Div step6Add step16Add z newVar =
 main = do
     let bigNum = replicate 14 9
         bigNum2 = digits 12345678910111
-        
+
+        blockPerDigit :: [Int -> Int]
         blockPerDigit = zipWith flip blocks bigNum2
         outcome = foldr (\f v -> f v) 0 blockPerDigit
-        
+
+        calcRes :: Int -> Int
         calcRes = calcBlockAlt 26 1 0 26000
         makeResText varInput res = "Outcome for " ++ show varInput ++ " = " ++ show res ++ "\n"
         
         calcSmall n = 
             let nums = digits n
+                blockPerNum :: [Int -> Int]
                 blockPerNum = zipWith flip blocksSmall nums
             in foldr (\f v -> f v) 0 blockPerNum
 
@@ -65,12 +68,13 @@ digits :: Integer -> [Int]
 digits = map (read.return) . show
 
 
+
+
+
+
+
 -- when step5Div == 1 and step6Add > 9
 -- 26 * z + step16Add + newVar
-
-
-
-
 
 -- For step5Div == 26
 -- =====================================
