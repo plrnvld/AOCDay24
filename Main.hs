@@ -18,6 +18,8 @@ blocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4,
     calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
 
 blocksSmall = [calcBlock11, calcBlock12, calcBlock13, calcBlock14]
+smallNums = filter (\n -> n `mod` 10 /= 0)  [9999, 9998 ..  11]
+       
 
 allInputs = [1..9]
 
@@ -48,23 +50,25 @@ main = do
         calcRes :: Int -> Int
         calcRes = calcBlockAlt 26 1 0 26000
         makeResText varInput res = "Outcome for " ++ show varInput ++ " = " ++ show res ++ "\n"
-        
+
         calcSmall n = 
-            let nums = digits n
+            let nums :: [Int]
+                nums = digits n
                 blockPerNum :: [Int -> Int]
                 blockPerNum = zipWith flip blocksSmall nums
-            in foldr (\f v -> f v) 0 blockPerNum
+            in foldr (\f (zs, z) -> (z:zs, f z)) ([], 0) blockPerNum
 
-        smallNums = filter (\n -> n `mod` 10 /= 0)  [9999, 9998 ..  11]
-        validNums = filter (\n -> calcSmall n == 0) smallNums
-        smallOutcomes = map (\n -> "Result for " ++ show n ++ " = " ++ show (calcSmall n) ++ "\n") validNums 
+        validNums :: [(Int, ([Int], Int))]
+        validNums = filter (\(n, (_, res)) -> res == 0) $ map (\n -> (n, calcSmall n)) smallNums
+        printRes (n, (zs, z)) = "Result for " ++ show n ++ " = " ++ show z ++ " " ++ show zs ++ "\n"
+        smallOutcomes = map printRes validNums 
     
     putStrLn $ concat smallOutcomes
     putStrLn $ concatMap (\i -> makeResText i (calcRes i)) allInputs
     print bigNum2
     print outcome
     
-digits :: Integer -> [Int]
+digits :: Int -> [Int]
 digits = map (read.return) . show
 
 
