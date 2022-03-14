@@ -13,7 +13,7 @@ calcBlock12 = calcBlock' 26 (-10) 12
 calcBlock13 = calcBlock' 26 (-4) 14
 calcBlock14 = calcBlock' 26 (-5) 14
 
-blocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4, 
+allBlocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4, 
     calcBlock5, calcBlock6, calcBlock7, calcBlock8, calcBlock9, 
     calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
 
@@ -32,7 +32,7 @@ calcBlock step5Div step6Add step16Add z newVar =
         z_2 = z_1 * y_1
         y_new = newVar + step16Add -- Step 14 & 15 & 16 combined
         in z_2 + y_new * x_1 -- Step 17 & 18 combined
-
+--             26     -5         14    13   1 
 calcBlock' :: Int -> Int -> Int -> Int -> Int -> Int
 calcBlock' step5Div step6Add step16Add z newVar =
     if z `mod` 26 + step6Add == newVar 
@@ -60,7 +60,7 @@ main = do
 digits :: Int -> [Int]
 digits = map (read.return) . show
 
-numRange maxN = filter ((notElem 0).digits) [maxN, maxN - 1 .. minWithoutZeroes maxN]
+numRange maxN = filter (notElem 0.digits) [maxN, maxN - 1 .. minWithoutZeroes maxN]
 
 minWithoutZeroes :: Int -> Int
 minWithoutZeroes n = fromDigits $ replicate (ceiling $ logBase 10.0 $ fromIntegral n) 1 
