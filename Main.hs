@@ -22,8 +22,8 @@ allBlocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4,
 blocksMini = [calcBlock12, calcBlock13, calcBlock14]
 numsMini = numRange 999
 
-blocksSmall = [calcBlock9, calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
-numsSmall = numRange 999999
+blocksSmall = [calcBlock7, calcBlock8, calcBlock9, calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
+numsSmall = numRange 99999999
 
 allInputs = [1..9]
 
@@ -60,7 +60,7 @@ main = do
 
         validMonads = filter isValid $ map (\n -> (digits n, checkMonad blocksSmall n)) numsSmall
         
-    -- putStrLn $ concatMap printRes validMonads
+    putStrLn $ concatMap printRes validMonads
     print $ "Res => " ++ show (experiment 2 7)
 
 experiment :: Int -> Int -> Int
