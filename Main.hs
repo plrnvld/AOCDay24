@@ -1,3 +1,5 @@
+import Debug.Trace
+
 calcBlock1 = calcBlock' 1 12 4
 calcBlock2 = calcBlock' 1 11 11
 calcBlock3 = calcBlock' 1 13 5
@@ -17,13 +19,16 @@ allBlocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4,
     calcBlock5, calcBlock6, calcBlock7, calcBlock8, calcBlock9, 
     calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
 
-blocksSmall = [calcBlock11, calcBlock12, calcBlock13, calcBlock14]
-smallNums = numRange 9999
+blocksMini = [calcBlock12, calcBlock13, calcBlock14]
+numsMini = numRange 999
+
+blocksSmall = [calcBlock9, calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
+numsSmall = numRange 999999
 
 allInputs = [1..9]
 
 calcBlock :: Int -> Int -> Int -> Int -> Int -> Int
-calcBlock step5Div step6Add step16Add z newVar =
+calcBlock step5Div step6Add step16Add newVar z =
     let x = z `mod` 26 -- Step 2 & 3 & 4 combined
         z_1 = z `div` step5Div
         x_1 = if x + step6Add == newVar then 0 else 1 -- Step 7 & 8 combined
@@ -32,9 +37,9 @@ calcBlock step5Div step6Add step16Add z newVar =
         z_2 = z_1 * y_1
         y_new = newVar + step16Add -- Step 14 & 15 & 16 combined
         in z_2 + y_new * x_1 -- Step 17 & 18 combined
---             26     -5         14    13   1 
+--             26     -5         14        1     15
 calcBlock' :: Int -> Int -> Int -> Int -> Int -> Int
-calcBlock' step5Div step6Add step16Add z newVar =
+calcBlock' step5Div step6Add step16Add newVar z =
     if z `mod` 26 + step6Add == newVar 
     then z `div` step5Div 
     else 26 * (z `div` step5Div) + newVar + step16Add
@@ -43,19 +48,23 @@ checkMonad :: [Int -> Int -> Int] -> Int -> MonadResult
 checkMonad blocks n  = 
     let vars = digits n
         blocksWithVar :: [Int -> Int]
-        blocksWithVar = zipWith flip blocks vars
-    in foldr (\f (zs, z) -> (zs ++ [z], f z)) ([], 0) blocksWithVar
+        blocksWithVar = zipWith (\b v -> b v) blocks vars
+    in foldl (\(zs, z) f -> let res = f z in(zs ++ [res], res)) ([0], 0) blocksWithVar
 
 main = do
     let printRes :: ([Int], MonadResult) -> [Char]
-        printRes (digits, (zs, z)) = "Vars" ++ show digits ++ " => " ++ show z ++ " " ++ show zs ++ "\n"
+        printRes (vs, (zs, z)) = "Vars" ++ show vs ++ " => " ++ show z ++ " " ++ show zs ++ "\n"
         
         isValid :: ([Int], MonadResult) -> Bool
-        isValid (digits, (_, res)) = res == 0
+        isValid (_, (_, res)) = res == 0
 
-        validMonads = filter isValid $ map (\n -> (digits n, checkMonad blocksSmall n)) smallNums
+        validMonads = filter isValid $ map (\n -> (digits n, checkMonad blocksSmall n)) numsSmall
         
-    putStrLn $ concatMap printRes validMonads
+    -- putStrLn $ concatMap printRes validMonads
+    print $ "Res => " ++ show (experiment 2 7)
+
+experiment :: Int -> Int -> Int
+experiment var z = calcBlock14 var z
     
 digits :: Int -> [Int]
 digits = map (read.return) . show
