@@ -23,7 +23,9 @@ blocksMini = [calcBlock12, calcBlock13, calcBlock14]
 numsMini = numRange 999
 
 blocksSmall = [calcBlock7, calcBlock8, calcBlock9, calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
-numsSmall = numRange 99999999
+numsSmall = numRange' 99999 -- allow all numbers
+
+blocksPrefix = [calcBlock1, calcBlock2, calcBlock3, calcBlock4, calcBlock5]
 
 allInputs = [1..9]
 
@@ -57,8 +59,9 @@ main = do
         
         isValid :: ([Int], MonadResult) -> Bool
         isValid (_, (_, res)) = res == 0
+        isWhatEver = const True
 
-        validMonads = filter isValid $ map (\n -> (digits n, checkMonad blocksSmall n)) numsSmall
+        validMonads = filter isWhatEver $ map (\n -> (digits n, checkMonad blocksPrefix n)) numsSmall
         
     putStrLn $ concatMap printRes validMonads
     print $ "Res => " ++ show (experiment 2 7)
@@ -70,6 +73,7 @@ digits :: Int -> [Int]
 digits = map (read.return) . show
 
 numRange maxN = filter (notElem 0.digits) [maxN, maxN - 1 .. minWithoutZeroes maxN]
+numRange' maxN = [maxN, maxN - 1 .. minWithoutZeroes maxN] -- allows all numbers
 
 minWithoutZeroes :: Int -> Int
 minWithoutZeroes n = fromDigits $ replicate (ceiling $ logBase 10.0 $ fromIntegral n) 1 
@@ -103,3 +107,31 @@ type MonadResult = ([Int], Int)
 -- Block 4 is the same as block 2
 -- Block 5 really does: f(var, z) = 26z + var + 14
 -- Block 6 only does something with step6Add when  step6Add = variable - (x `mod` 26)
+
+
+-- Block1 to Block5 combined: 
+-- 26(26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11) + var5 + 14
+-- Simplified: (26M + var5 + 14) (where M is whole)
+
+-- Block 6
+-- if z `mod` 26 + step6Add == newVar
+-- if (26M + var5 + 14) `mod` 26 + step6Add == newVar 
+-- --> 0 + var5 + 14 + -10 == newVar
+-- --> var5 + 4 == var6 
+-- then z `div` 26 
+--   --> divide by 26, remove remainder
+-- else 26 * ((26M + var5 + 14) `div` 26) + newVar + step16Add
+--   --> 26M + newVar + step16Add (multiply by 26 again)
+
+-- Conclusion: var5 + 4 == var6 has to be true, else this cannot terminate (Right?)
+
+
+-- Block 8
+-- --> z `mod` 26 + -9 == newVar
+-- --> (26z + var2 + 11) `mod` 26 + -9 == var8
+-- --> var2 + 11 - 9 = var8
+
+-- Conclusion: var2 + 2 = var8
+
+-- Block 9
+-- if (z `div` step5Div) `mod` 26 + -3 == newVar9
