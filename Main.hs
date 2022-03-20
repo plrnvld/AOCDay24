@@ -1,23 +1,25 @@
 import Debug.Trace
 
-calcBlock1 = calcBlock' 1 12 4
-calcBlock2 = calcBlock' 1 11 11
-calcBlock3 = calcBlock' 1 13 5
-calcBlock4 = calcBlock2
-calcBlock5 = calcBlock' 1 14 14
-calcBlock6 = calcBlock' 26 (-10) 7
-calcBlock7 = calcBlock2
-calcBlock8 = calcBlock' 26 (-9) 4
-calcBlock9 = calcBlock' 26 (-3) 6
-calcBlock10 = calcBlock3
-calcBlock11 = calcBlock' 26 (-5) 9
-calcBlock12 = calcBlock' 26 (-10) 12
-calcBlock13 = calcBlock' 26 (-4) 14
-calcBlock14 = calcBlock' 26 (-5) 14
+calcBlock1 = calcBlock' 1 12 4 
+calcBlock2 = calcBlock' 1 11 11      -- (* 26)
+calcBlock3 = calcBlock' 1 13 5       -- (* 26)
+calcBlock4 = calcBlock2              -- (* 26)
+calcBlock5 = calcBlock' 1 14 14      -- (* 26)
+calcBlock6 = calcBlock' 26 (-10) 7   -- (`div 26` or * 26)
+calcBlock7 = calcBlock2              -- (* 26)
+calcBlock8 = calcBlock' 26 (-9) 4    -- (`div 26` or * 26)
+calcBlock9 = calcBlock' 26 (-3) 6    -- (`div 26` or * 26)
+calcBlock10 = calcBlock3             -- (* 26)
+calcBlock11 = calcBlock' 26 (-5) 9   -- (`div 26` or * 26)
+calcBlock12 = calcBlock' 26 (-10) 12 -- (`div 26` or * 26)
+calcBlock13 = calcBlock' 26 (-4) 14  -- (`div 26` or * 26)
+calcBlock14 = calcBlock' 26 (-5) 14  -- (`div 26` or * 26)
 
 allBlocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4, 
     calcBlock5, calcBlock6, calcBlock7, calcBlock8, calcBlock9, 
     calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
+
+allNums = (numRange 99999999999999)
 
 blocksMini = [calcBlock12, calcBlock13, calcBlock14]
 numsMini = numRange 999
@@ -61,14 +63,13 @@ main = do
         isValid (_, (_, res)) = res == 0
         isWhatEver = const True
 
-        validMonads = filter isWhatEver $ map (\n -> (digits n, checkMonad blocksPrefix n)) numsSmall
-        
-    putStrLn $ concatMap printRes validMonads
-    print $ "Res => " ++ show (experiment 2 7)
+        validMonads = filter isValid $ map (\n -> (digits n, checkMonad allBlocks n)) allNums
 
-experiment :: Int -> Int -> Int
-experiment var z = calcBlock14 var z
-    
+    -- print $ (take 10 (numRange 99999999999999))
+    putStrLn $ concatMap printRes validMonads
+    -- print $ "Res => " ++ show (calcBlock14 2 6)
+    print "End"
+
 digits :: Int -> [Int]
 digits = map (read.return) . show
 
@@ -101,19 +102,59 @@ type MonadResult = ([Int], Int)
 -- then z `mod` 26 - 5 == newVar (dan z = newVar + 5)
 
 
--- Block 1 really does: f(var) = var + 4
--- Block 2 really does: f(var, z) = 26z + var + 11
--- Block 3 really does: f(var, z) = 26z + var + 5
--- Block 4 is the same as block 2
--- Block 5 really does: f(var, z) = 26z + var + 14
--- Block 6 only does something with step6Add when  step6Add = variable - (x `mod` 26)
+-- ALL TOGETHER
+
+-- Block 1 really does: f(var) = var1 + 4
+-- Block 2 really does: f(var, z) = 26z + var2 + 11
+-- Block 3 really does: f(var, z) = 26z + var3 + 5
+-- Block 4 is the same as block 2 ==> 26z + var4 + 11
+-- Block 5 really does: f(var, z) = 26z + var5 + 14
 
 
 -- Block1 to Block5 combined: 
 -- 26(26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11) + var5 + 14
--- Simplified: (26M + var5 + 14) (where M is whole)
 
--- Block 6
+
+-- Block 6:
+-- (26(26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11) + var5 + 14) `div` 26
+-- 26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11
+
+-- Block 7: 26z + var2 + 11
+-- 26(26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11) + var7 + 11
+
+-- Block 8:
+-- (26(26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11) + var7 + 11) `div` 26
+-- (26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11)
+
+-- Block 9:
+-- (26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11) `div` 26
+-- 26(26(var1 + 4) + var2 + 11) + var3 + 5
+
+-- Block 10: 26z + var10 + 5
+-- 26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var10 + 5
+
+-- Block11:
+-- (26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var10 + 5) `div` 26
+-- 26(26(var1 + 4) + var2 + 11) + var3 + 5
+
+-- Block 12:
+-- (26(26(var1 + 4) + var2 + 11) + var3 + 5) `div` 26
+-- 26(var1 + 4) + var2 + 11
+
+-- Block 13:
+-- (26(var1 + 4) + var2 + 11) `div` 26
+-- var1 + 4
+
+-- Block 14:
+
+
+
+
+
+
+
+-- Block 6 (calcBlock' 26 (-10) 7)
+
 -- if z `mod` 26 + step6Add == newVar
 -- if (26M + var5 + 14) `mod` 26 + step6Add == newVar 
 -- --> 0 + var5 + 14 + -10 == newVar
@@ -126,12 +167,60 @@ type MonadResult = ([Int], Int)
 -- Conclusion: var5 + 4 == var6 has to be true, else this cannot terminate (Right?)
 
 
--- Block 8
+
+-- Block 7 (calcBlock' 1 11 11)
+
+--  == Block 2 ==> 26z + var7 + 11
+
+
+-- Block 8 (calcBlock' 26 (-9) 4)
+
 -- --> z `mod` 26 + -9 == newVar
 -- --> (26z + var2 + 11) `mod` 26 + -9 == var8
 -- --> var2 + 11 - 9 = var8
-
 -- Conclusion: var2 + 2 = var8
 
--- Block 9
+-- Block 9 (calcBlock' 26 (-3) 6)
+
 -- if (z `div` step5Div) `mod` 26 + -3 == newVar9
+-- --> -3 == var9
+
+-- Block 10 (calcBlock' 1 13 5)
+
+--  == Block 3 ==> 26z + var10 + 5
+
+-- Block 11 (calcBlock' 26 (-5) 9)
+
+-- if (26z + var10 + 5) `mod` 26 + -5 == var11
+-- ==> var10 + 5 + -5 == var11
+-- ==> var10 == var11
+
+
+-- Block 12 (calcBlock' 26 (-10) 12)
+
+-- if z `mod` 26 + -10 == newVar
+
+
+
+
+-- Block 13 (calcBlock' 26 (-4) 14)
+-- if z `mod` 26 + -4 == var13
+-- --> z `mod` 26 + -4 == var14
+-- --> z - 5 == var14
+
+-- Block 14 (calcBlock' 26 (-5) 14)
+-- if z `mod` 26 + -5 == var14
+-- --> z `mod` 26 + -5 == var14
+-- --> z - 5 == var14
+-- z is tussen 6 (1+5) en 14 (9+5) 
+-- then z `div` 26 ==> moet 0 zijn (z moet tussen 0 en 25 zijn)
+
+-- **************************
+-- >> z - 5 == var14
+-- >> z elem [6,..,14]
+
+
+-- What about: z == Block 1
+-- Block 1: var1 + 4
+-- var1 + 4 - 5 == var14
+-- var1 - 1 == var14 (var1 cannot be 1, var14 cannot be 9)
