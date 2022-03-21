@@ -15,7 +15,6 @@ calcBlock12 = calcBlock' 26 (-10) 12 -- [Div when var3 - 5 == var12] 26(var1 + 4
 calcBlock13 = calcBlock' 26 (-4) 14  -- [Div when var2 + 7 == var13] var1 + 4
 calcBlock14 = calcBlock' 26 (-5) 14  -- [Div when var1 - 1 == var14] 0
 
-
 -- Limitations:
 -- var1 - 1 == var14
 -- var2 + 7 == var13
@@ -27,13 +26,11 @@ calcBlock14 = calcBlock' 26 (-5) 14  -- [Div when var1 - 1 == var14] 0
 -- var7 + 2 == var8
 -- var10 == var11
 
-
-
 allBlocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4, 
     calcBlock5, calcBlock6, calcBlock7, calcBlock8, calcBlock9, 
     calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
 
-allNums = take 10 $ numRange 99999999999999
+allNums = numRange 99999999999999
 
 blocksMini = [calcBlock12, calcBlock13, calcBlock14]
 numsMini = numRange 999
@@ -82,6 +79,7 @@ main = do
     -- print $ (take 10 (numRange 99999999999999))
     putStrLn $ concatMap printRes validMonads
     -- print $ "Res => " ++ show (calcBlock14 2 6)
+    -- print $ followConstraints (digits 91911513977488)
     print "End"
 
 digits :: Int -> [Int]
@@ -102,9 +100,21 @@ followConstraints ds = notElem 0 ds && otherLimits ds
 -- var10 == var11
 
 otherLimits :: [Int] -> Bool
-otherLimits (v1:v2:v3:v4:v5:v6:v7:v8:v9:v10:v11:v12:v13:v14:[])
-    = v1 - 1 == v14 && v2 + 7 == v13 && v3 + (-5) == v12 && v4 == 1 && v9 == 9 && v5 + 4 == v6 && v7 + 2 == v8 && v10 == v11
-otherLimits _ = False
+otherLimits ds = let (v1:r1) = ds
+                     (v2:r2) = r1
+                     (v3:r3) = r2
+                     (v4:r4) = r3
+                     (v5:r5) = r4
+                     (v6:r6) = r5
+                     (v7:r7) = r6
+                     (v8:r8) = r7
+                     (v9:r9) = r8
+                     (v10:r10) = r9
+                     (v11:r11) = r10
+                     (v12:r12) = r11
+                     (v13:r13) = r12
+                     (v14:[]) = r13
+                in v1 - 1 == v14 && v2 + 7 == v13 && v3 + (-5) == v12 && v4 == 1 && v9 == 9 && v5 + 4 == v6 && v7 + 2 == v8 && v10 == v11
 
 numRange :: Int -> [Int]
 numRange maxN = filter (followConstraints.digits) [maxN, maxN - 1 .. minWithoutZeroes maxN]
