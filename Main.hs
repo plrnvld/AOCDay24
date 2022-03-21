@@ -1,25 +1,39 @@
 import Debug.Trace
 
-calcBlock1 = calcBlock' 1 12 4 
-calcBlock2 = calcBlock' 1 11 11      -- (* 26)
-calcBlock3 = calcBlock' 1 13 5       -- (* 26)
-calcBlock4 = calcBlock2              -- (* 26)
-calcBlock5 = calcBlock' 1 14 14      -- (* 26)
-calcBlock6 = calcBlock' 26 (-10) 7   -- (`div 26` or * 26) --- ### Continue here, can this ever be `div`???? (because (var5 + 14) + -5 == var6 ==> var5 + 9 = var6 ⚡)
-calcBlock7 = calcBlock2              -- (* 26)
-calcBlock8 = calcBlock' 26 (-9) 4    -- (`div 26` or * 26)
-calcBlock9 = calcBlock' 26 (-3) 6    -- (`div 26` or * 26)
-calcBlock10 = calcBlock3             -- (* 26)
-calcBlock11 = calcBlock' 26 (-5) 9   -- (`div 26` or * 26)
-calcBlock12 = calcBlock' 26 (-10) 12 -- (`div 26` or * 26)
-calcBlock13 = calcBlock' 26 (-4) 14  -- (`div 26` or * 26)
-calcBlock14 = calcBlock' 26 (-5) 14  -- (`div 26` or * 26)
+calcBlock1 = calcBlock' 1 12 4       --                              var1 + 4
+calcBlock2 = calcBlock' 1 11 11      -- (* 26)                       26(var1 + 4) + var2 + 11
+calcBlock3 = calcBlock' 1 13 5       -- (* 26)                       26(26(var1 + 4) + var2 + 11) + var3 + 5
+calcBlock4 = calcBlock2              -- (* 26)                       26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11
+calcBlock5 = calcBlock' 1 14 14      -- (* 26)                       26(26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11) + var5 + 14
+calcBlock6 = calcBlock' 26 (-10) 7   -- [Div when var5 + 4 == var6]  26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11
+calcBlock7 = calcBlock2              -- (* 26)                       26(26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11) + var7 + 11
+calcBlock8 = calcBlock' 26 (-9) 4    -- [Div when var7 + 2 == var8]  26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var4 + 11
+calcBlock9 = calcBlock' 26 (-3) 6    -- [Div when var4 + 8 == var9❗] 26(26(var1 + 4) + var2 + 11) + var3 + 5
+calcBlock10 = calcBlock3             -- (* 26)                       26(26(26(var1 + 4) + var2 + 11) + var3 + 5) + var10 + 5
+calcBlock11 = calcBlock' 26 (-5) 9   -- [Div when var10 == var11]    26(26(var1 + 4) + var2 + 11) + var3 + 5
+calcBlock12 = calcBlock' 26 (-10) 12 -- [Div when var3 - 5 == var12] 26(var1 + 4) + var2 + 11
+calcBlock13 = calcBlock' 26 (-4) 14  -- [Div when var2 + 7 == var13] var1 + 4
+calcBlock14 = calcBlock' 26 (-5) 14  -- [Div when var1 - 1 == var14] 0
+
+
+-- Limitations:
+-- var1 - 1 == var14
+-- var2 + 7 == var13
+-- var3 - 5 == var12
+-- var4 + 8 == var9
+--   --> var4 == 1
+--   --> var9 == 9
+-- var5 + 4 == var6
+-- var7 + 2 == var8
+-- var10 == var11
+
+
 
 allBlocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4, 
     calcBlock5, calcBlock6, calcBlock7, calcBlock8, calcBlock9, 
     calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
 
-allNums = (numRange 99999999999999)
+allNums = take 10 $ numRange 99999999999999
 
 blocksMini = [calcBlock12, calcBlock13, calcBlock14]
 numsMini = numRange 999
@@ -73,7 +87,27 @@ main = do
 digits :: Int -> [Int]
 digits = map (read.return) . show
 
-numRange maxN = filter (notElem 0.digits) [maxN, maxN - 1 .. minWithoutZeroes maxN]
+followConstraints :: [Int] -> Bool
+followConstraints ds = notElem 0 ds && otherLimits ds
+
+-- Limitations:
+-- var1 - 1 == var14
+-- var2 + 7 == var13
+-- var3 - 5 == var12
+-- var4 + 8 == var9
+--   --> var4 == 1
+--   --> var9 == 9
+-- var5 + 4 == var6
+-- var7 + 2 == var8
+-- var10 == var11
+
+otherLimits :: [Int] -> Bool
+otherLimits (v1:v2:v3:v4:v5:v6:v7:v8:v9:v10:v11:v12:v13:v14:[])
+    = v1 - 1 == v14 && v2 + 7 == v13 && v3 + (-5) == v12 && v4 == 1 && v9 == 9 && v5 + 4 == v6 && v7 + 2 == v8 && v10 == v11
+otherLimits _ = False
+
+numRange :: Int -> [Int]
+numRange maxN = filter (followConstraints.digits) [maxN, maxN - 1 .. minWithoutZeroes maxN]
 numRange' maxN = [maxN, maxN - 1 .. minWithoutZeroes maxN] -- allows all numbers
 
 minWithoutZeroes :: Int -> Int
