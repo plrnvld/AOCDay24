@@ -26,6 +26,9 @@ calcBlock14 = calcBlock' 26 (-5) 14  -- [Div when var1 - 1 == var14] 0
 -- var7 + 2 == var8
 -- var10 == var11
 
+-- [21611513911181]
+-- [92915979999498]
+
 allBlocks = [calcBlock1, calcBlock2, calcBlock3, calcBlock4, 
     calcBlock5, calcBlock6, calcBlock7, calcBlock8, calcBlock9, 
     calcBlock10, calcBlock11, calcBlock12, calcBlock13, calcBlock14]
@@ -77,9 +80,10 @@ main = do
         validMonads = filter isValid $ map (\n -> (digits n, checkMonad allBlocks n)) allNums
 
     -- print $ (take 10 (numRange 99999999999999))
-    putStrLn $ concatMap printRes validMonads
+    -- putStrLn $ concatMap printRes validMonads
     -- print $ "Res => " ++ show (calcBlock14 2 6)
-    -- print $ followConstraints (digits 91911513977488)
+    print $ followConstraints (digits 21611513911181)
+    -- print allNums
     print "End"
 
 digits :: Int -> [Int]
